@@ -16,7 +16,7 @@
 
 ## Installation
 
-1. Clone the repository or download the source code or us composer:
+1. Clone the repository or download the source code or use composer:
 ```
    composer require ayela-emmanuel/ayela-orm
 ```
