@@ -16,7 +16,10 @@
 
 ## Installation
 
-1. Clone the repository or download the source code.
+1. Clone the repository or download the source code or us composer:
+```
+   composer require ayela-emmanuel/ayela-orm
+```
 2. Ensure that the `PDO` extension is enabled for your PHP installation (MySQL is the default).
 3. Add the necessary namespace `AyelaORM` to your project.
 
