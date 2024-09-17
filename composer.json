@@ -1,10 +1,10 @@
 {
-    "name": "ayela-emmanuel/ayela-orm",
+    "name": "ayela/ayelaorm",
     "description": "This packge Is a Minimal ORM Setup for intareacting with your SQL Database using PDO but abstracts the Database to a more OOP Approch",
     "license": "AGPL-3.0-or-later",
     "autoload": {
         "psr-4": {
-            "ayela-emmanuel\\ayela-ORM\\": "src/"
+            "AyelaORM\\": "src/"
         }
     },
     "require": {
