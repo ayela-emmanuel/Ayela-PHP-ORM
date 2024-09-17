@@ -1,0 +1,11 @@
+{
+    "name": "ayela-emmanuel/ayela-orm",
+    "description": "A hello world composer private package.",
+    "autoload": {
+        "psr-4": {
+            "ayela-emmanuel\\ayela-ORM\\": "src/"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
