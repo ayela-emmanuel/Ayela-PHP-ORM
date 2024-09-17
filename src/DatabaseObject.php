@@ -1,8 +1,8 @@
 <?php
 declare(strict_types =1);
-namespace AyelaORM\DatabaseObject;
-use AyelaORM\SQLType\SQLType;
-use AyelaORM\Database\Database;
+namespace AyelaORM;
+use AyelaORM\SQLType;
+use AyelaORM\Database;
 
 
 

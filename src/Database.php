@@ -1,5 +1,5 @@
 <?php
-namespace AyelaORM\Database;
+namespace AyelaORM;
 /**
  * Initalize Database for Ayela ORM
  */

@@ -1,6 +1,6 @@
 <?php
 
-namespace AyelaORM\SQLType;
+namespace AyelaORM;
 
 
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
