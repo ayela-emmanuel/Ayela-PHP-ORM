@@ -222,6 +222,10 @@ class DatabaseObject {
      * Save a record to the database.
      * 
      */
+        /**
+     * Save a record to the database.
+     * 
+     */
     public function save() : bool {
         $reflection = new \ReflectionClass($this);
         $properties = $reflection->getProperties();
@@ -234,10 +238,13 @@ class DatabaseObject {
     
             foreach ($properties as $property) {
                 $propertyName = $property->getName();
-                if($property->getAttributes(SQLIgnore::class)==0){
+                $attributes = $property->getAttributes(SQLIgnore::class);
+                if(count($attributes) == 0){
                     $columnName = null;
                     if (strpos($propertyName, 'db_') === 0) {
                         $columnName = substr($propertyName, 3); 
+                    }else{
+                        $columnName = $propertyName;
                     }
                     $property->setAccessible(true);
                     $value = $property->getValue($this);
@@ -246,12 +253,14 @@ class DatabaseObject {
                         $idValue = $value;  // Store the primary key value for the WHERE clause in case of update
                         continue;
                     }
+                    if($value instanceof \DateTime){
+                        $value = $value->format('Y-m-d H:i:s');
+                    }
+                    $columns[] = $columnName;
+                    $values[] = $value;
+                    $placeholders[] = "?";
                 }
                 
-
-                $columns[] = $columnName;
-                $values[] = $value;
-                $placeholders[] = "?";
             }
     
             if(!$this->populated) {
@@ -291,6 +300,7 @@ class DatabaseObject {
             return false;
         }
     }
+
 
     /**
      * Retreves Records
