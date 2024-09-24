@@ -43,7 +43,7 @@ Database::setup('localhost', 'database_name', 'username', 'password', false);
 
 
 Creating Models
-To create a model that interacts with the database, extend the DatabaseObject class. Any property prefixed with db_ will be considered as a database column:
+To create a model that interacts with the database, extend the DatabaseObject class :
 
 ```php
 namespace Models;
@@ -52,15 +52,19 @@ use AyelaORM\SQLType;
 
 class User extends DatabaseObject {
     #[SQLType("VARCHAR(255)")]
-    public string $db_username;
+    public string $username;
     
     #[SQLType("VARCHAR(255)")]
-    public string $db_email;
+    public string $email;
     
     #[SQLType("INT")]
-    public int $db_age;
+    public int $age;
+
+    #[SQLIgnore]
+    public int $some_private_data;
 }
 ```
+To ignore a property add the `#[SQLIgnore]` arreibute.  
 Then Register on startup using
 ```php
 User::register();
@@ -97,6 +101,18 @@ Retrieve the first record:
 $user = Models\User::first();
 ```
 *More Coming soon*
+
+### Removing Data
+To delete a single record:
+```php
+$id = 1;
+$user = Models\User::delete($id);
+```
+To delete a group of records:
+```php
+$ids = [1,2,3,4,6]; 
+$user = Models\User::deleteGroup($ids);
+```
 
 
 ## Schema Management
