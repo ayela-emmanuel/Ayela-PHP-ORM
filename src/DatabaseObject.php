@@ -235,19 +235,19 @@ class DatabaseObject {
             foreach ($properties as $property) {
                 $propertyName = $property->getName();
                 if (strpos($propertyName, 'db_') === 0) {
-                    $columnName = substr($propertyName, 3);
-                    $property->setAccessible(true);
-                    $value = $property->getValue($this);
-    
-                    if ($columnName == 'id') {
-                        $idValue = $value;  // Store the primary key value for the WHERE clause in case of update
-                        continue;
-                    }
-    
-                    $columns[] = $columnName;
-                    $values[] = $value;
-                    $placeholders[] = "?";
+                    $columnName = substr($propertyName, 3); 
                 }
+                $property->setAccessible(true);
+                $value = $property->getValue($this);
+
+                if ($columnName == 'id') {
+                    $idValue = $value;  // Store the primary key value for the WHERE clause in case of update
+                    continue;
+                }
+
+                $columns[] = $columnName;
+                $values[] = $value;
+                $placeholders[] = "?";
             }
     
             if(!$this->populated) {
@@ -452,10 +452,11 @@ class DatabaseObject {
             $propertyName = $property->getName();
             if (strpos($propertyName, 'db_') === 0) {
                 $columnName = substr($propertyName, 3);
-                $property->setAccessible(true);
-                if(isset($data[$columnName])){
-                    $property->setValue($this ,$data[$columnName]);
-                }
+                
+            }
+            $property->setAccessible(true);
+            if(isset($data[$columnName])){
+                $property->setValue($this ,$data[$columnName]);
             }
         }
         $this->populated = true;
