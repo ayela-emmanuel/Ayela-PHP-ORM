@@ -234,16 +234,20 @@ class DatabaseObject {
     
             foreach ($properties as $property) {
                 $propertyName = $property->getName();
-                if (strpos($propertyName, 'db_') === 0) {
-                    $columnName = substr($propertyName, 3); 
-                }
-                $property->setAccessible(true);
-                $value = $property->getValue($this);
+                if($property->getAttributes(SQLIgnore::class)==0){
+                    $columnName = null;
+                    if (strpos($propertyName, 'db_') === 0) {
+                        $columnName = substr($propertyName, 3); 
+                    }
+                    $property->setAccessible(true);
+                    $value = $property->getValue($this);
 
-                if ($columnName == 'id') {
-                    $idValue = $value;  // Store the primary key value for the WHERE clause in case of update
-                    continue;
+                    if ($columnName == 'id') {
+                        $idValue = $value;  // Store the primary key value for the WHERE clause in case of update
+                        continue;
+                    }
                 }
+                
 
                 $columns[] = $columnName;
                 $values[] = $value;
@@ -450,14 +454,17 @@ class DatabaseObject {
 
         foreach ($properties as $key => $property) {
             $propertyName = $property->getName();
-            if (strpos($propertyName, 'db_') === 0) {
-                $columnName = substr($propertyName, 3);
-                
+            if($property->getAttributes(SQLIgnore::class)==0){
+                $columnName = null;
+                if (strpos($propertyName, 'db_') === 0) {
+                    $columnName = substr($propertyName, 3);
+                }
+                $property->setAccessible(true);
+                if(isset($data[$columnName])){
+                    $property->setValue($this ,$data[$columnName]);
+                }
             }
-            $property->setAccessible(true);
-            if(isset($data[$columnName])){
-                $property->setValue($this ,$data[$columnName]);
-            }
+            
         }
         $this->populated = true;
         return $this;
