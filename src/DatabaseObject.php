@@ -16,6 +16,7 @@ class DatabaseObject {
     public int $db_id = 0;
 
     //Public
+    #[SQLIgnore]
     public ?\Throwable $last_error = null;
     //Private
     private bool $populated = false;
@@ -28,6 +29,12 @@ class DatabaseObject {
         
     }
 
+    public static function register(){
+        if(!Database::$frozen){
+            $class = new static();
+            $class->checkSchema(); 
+         }
+    }
 
     private function checkSchema(): void
     {
@@ -38,8 +45,11 @@ class DatabaseObject {
 
 
         foreach ($properties as $property) {
-            $type = $this->getSQLType($property);
-            $newSchema[$property->getName()] = $type;
+            $attributes = $property->getAttributes(SQLIgnore::class);
+            if (empty($attributes)) {
+                $type = $this->getSQLType($property);
+                $newSchema[$property->getName()] = $type;
+            }
         }
 
         $schemaHash = md5(json_encode($newSchema));
@@ -62,9 +72,10 @@ class DatabaseObject {
                 foreach ($alterStatements as $sql) {
                     try {
                         Database::getConnection()->exec($sql);
-                        echo "Executed: $sql\n";
+                        error_log("Executed: $sql\n");
+                        
                     } catch (\PDOException $th) {
-                        echo "Failed To Execute: $sql\n";
+                        error_log("Failed To Execute: $sql\n");
                     }
                 }
             }
@@ -117,14 +128,16 @@ class DatabaseObject {
         }
         
     }
-
+    
     private function createTable(array $schema): void
     {
-        $tableName = static::class;
+        $tableName = $this->cleanName(static::class);
         $columns = [];
         
         foreach ($schema as $property => $sqlType) {
-            $property = str_replace("db_","",$property);
+            if(str_starts_with($property,"db_")){
+                $property = str_replace("db_","",$property);
+            }
             if($property == "id"){
                 $sqlType.=" PRIMARY KEY";
             }

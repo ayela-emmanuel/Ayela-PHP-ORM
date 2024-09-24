@@ -1,6 +1,6 @@
 {
     "name": "ayela/ayelaorm",
-    "description": "This packge Is a Minimal ORM Setup for intareacting with your SQL Database using PDO but abstracts the Database to a more OOP Approch",
+    "description": "This packge Is a Minimal ORM Setup for interacting with your SQL Database using PDO but abstracts the Database to a more OOP Approch",
     "license": "AGPL-3.0-or-later",
     "version": "1.0.0",
     "autoload": {

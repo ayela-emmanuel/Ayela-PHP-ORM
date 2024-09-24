@@ -61,10 +61,15 @@ class User extends DatabaseObject {
     public int $db_age;
 }
 ```
+Then Register on startup using
+```php
+User::register();
+```
 
 Note: Properties with the db_ prefix are automatically handled as database columns.  
-  
-- You can also specify the SQL type for each property using the SQLType attribute.
+
+
+- You can specify the SQL type for each property using the SQLType attribute.
 
 
 ## Saving and Retrieving Data
