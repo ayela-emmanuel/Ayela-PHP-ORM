@@ -3,8 +3,8 @@ declare(strict_types =1);
 namespace AyelaORM;
 use AyelaORM\SQLType;
 use AyelaORM\Database;
-
-
+use DateTime;
+use Exception;
 
 /**
  * DatabaseObject
@@ -222,10 +222,6 @@ class DatabaseObject {
      * Save a record to the database.
      * 
      */
-        /**
-     * Save a record to the database.
-     * 
-     */
     public function save() : bool {
         $reflection = new \ReflectionClass($this);
         $properties = $reflection->getProperties();
@@ -247,13 +243,18 @@ class DatabaseObject {
                         $columnName = $propertyName;
                     }
                     $property->setAccessible(true);
-                    $value = $property->getValue($this);
+
+                    $value = null;
+                    if ($property->isInitialized($this)) {
+                        $value = $property->getValue($this) ?? null;
+                    }
+                    
 
                     if ($columnName == 'id') {
                         $idValue = $value;  // Store the primary key value for the WHERE clause in case of update
                         continue;
                     }
-                    if($value instanceof \DateTime){
+                    if($value instanceof DateTime){
                         $value = $value->format('Y-m-d H:i:s');
                     }
                     $columns[] = $columnName;
@@ -300,7 +301,6 @@ class DatabaseObject {
             return false;
         }
     }
-
 
     /**
      * Retreves Records
@@ -362,7 +362,7 @@ class DatabaseObject {
 
     /**
      * Retreves Record by field TODO
-     * @return static
+     * @return static[]
      */
     public static function getBy($field, $value, $page = 1, $maxResults = 10) {
         $reflection = self::getReflection();
@@ -373,11 +373,17 @@ class DatabaseObject {
             self::cleanName($reflection->getName()),
             $field
         );
-
         $stmt = Database::getConnection()->prepare($sql);
-        $stmt->execute([$value, $start, $maxResults]);
+        $stmt->bindParam(1, $value, \PDO::PARAM_INT);       
+        $stmt->bindParam(2, $start, \PDO::PARAM_INT);       
+        $stmt->bindParam(3, $maxResults, \PDO::PARAM_INT); 
+        $stmt->execute();
 
-        return ($reflection->newInstance())->populate($stmt->fetch(\PDO::FETCH_ASSOC));
+        $allData = [];
+        foreach($stmt->fetchAll(\PDO::FETCH_ASSOC) as $data){
+            array_push($allData, $reflection->newInstance()->populate($data));
+        }
+        return ($allData);
     }
     /**
      * Updates Field by id 
@@ -464,14 +470,20 @@ class DatabaseObject {
 
         foreach ($properties as $key => $property) {
             $propertyName = $property->getName();
-            if($property->getAttributes(SQLIgnore::class)==0){
-                $columnName = null;
+            $attributes = $property->getAttributes(SQLIgnore::class);
+            if(count($attributes) == 0){
+                $columnName = $propertyName ;
                 if (strpos($propertyName, 'db_') === 0) {
                     $columnName = substr($propertyName, 3);
                 }
                 $property->setAccessible(true);
                 if(isset($data[$columnName])){
-                    $property->setValue($this ,$data[$columnName]);
+                    if($property->getType()->getName() === 'DateTime'){
+                        $property->setValue($this, new DateTime($data[$columnName]));
+                    }else{
+                        $property->setValue($this ,$data[$columnName]);
+                    }
+                    
                 }
             }
             
