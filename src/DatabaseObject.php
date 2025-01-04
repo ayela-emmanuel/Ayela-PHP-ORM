@@ -658,7 +658,29 @@ class DatabaseObject
                         
                     } elseif ($this->isSerializableType($declaredType)) {
                         // Deserialize JSON data
-                        $property->setValue($this, json_decode($data[$columnName], true));
+                        //$property->setValue($this, json_decode($data[$columnName], true));
+
+                        $decodedData = json_decode($data[$columnName], true);
+
+                        // Create an instance of the declared type without invoking the constructor
+                        $reflectionClass = new ReflectionClass($declaredType);
+                        $object = $reflectionClass->newInstanceWithoutConstructor();
+
+                        // Map the array to the object's properties directly
+                        foreach ($decodedData as $key => $value) {
+                            if ($reflectionClass->hasProperty($key)) {
+                                $propertyReflection = $reflectionClass->getProperty($key);
+                                $propertyReflection->setAccessible(true); // Make the property accessible
+                                $propertyReflection->setValue($object, $value); // Set the property value
+                            }
+                        }
+
+
+                        // Assign the fully populated object to the property
+                        $property->setValue($this, $object);
+
+                        
+
                     } elseif ($declaredType === 'array') {
                         // Deserialize arrays
                         $property->setValue($this, json_decode($data[$columnName], true));
